@@ -8,7 +8,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: PlayerRobotCloakedMaterial
-  m_Shader: {fileID: 4800000, guid: 50d4f134599b1be438cd3a9836a8a050, type: 3}
+  m_Shader: {fileID: 4800000, guid: 0ef717b2d21a5124a9e08143294644a7, type: 3}
   m_ShaderKeywords: _ALPHAPREMULTIPLY_ON _EMISSION _FRESNELFEATURE_ON _POSITIONFEATURE_Y
     _POSITIONSPACEFEATURE_WORLD _SOFTINTERSECTION1FEATURE_OFF _SOFTINTERSECTION2FEATURE_OFF
   m_LightmapFlags: 1
@@ -57,8 +57,8 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 2800000, guid: 9caeacdad765bc447985d437fdf805cf, type: 3}
-        m_Scale: {x: 1, y: 1}
+        m_Texture: {fileID: 2800000, guid: 796646ac7ccda3e498672ac74ae94e5a, type: 3}
+        m_Scale: {x: 20, y: 20}
         m_Offset: {x: 0, y: 0}
     - _MetallicGlossMap:
         m_Texture: {fileID: 0}
@@ -81,7 +81,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Floats:
-    - _Alpha: 1
+    - _Alpha: 0.15
     - _AlphaMaskAffect: 0.5
     - _AlphaMaskFeature: 0
     - _BumpScale: 1
@@ -131,6 +131,7 @@ Material:
     - _NormalMapFeature: 0
     - _NormalScale: 0
     - _OcclusionStrength: 1
+    - _Outline: 0.15
     - _Parallax: 0.02
     - _PositionDirection: 1
     - _PositionFeature: 1
@@ -166,4 +167,6 @@ Material:
     - _MainColor: {r: 0, g: 0.7490196, b: 0.39215687, a: 0}
     - _MaskCenter: {r: 0, g: 0, b: 0, a: 0}
     - _MaskSize: {r: 0, g: 0, b: 0, a: 0}
+    - _OutlineColor: {r: 0, g: 1, b: 0.95873094, a: 1}
+    - _OutlineOffset: {r: 0, g: 0, b: 0, a: 1}
     - _RandomGlitchOffset: {r: -0.5, g: 0, b: 0, a: 0}

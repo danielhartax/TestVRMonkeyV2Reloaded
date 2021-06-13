@@ -68,13 +68,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 326b26fd072827e488259479fb723103, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  doorObject: {fileID: 4586693325316988}
+  doorObject: {fileID: 4508618167453208}
   locked: 0
   openTime: 0.25
   openDeltaY: 1.9
   normalMaterial: {fileID: 2100000, guid: 835a6489ba1265c4992dac02e4cc5923, type: 2}
   lockedMaterial: {fileID: 2100000, guid: 04f45c8b234aa404d9f14a56ab5bd220, type: 2}
-  doorRenderer: {fileID: 23421923051836390}
+  doorRenderer:
+  - {fileID: 23421923051836390}
 --- !u!1 &1864941934904708
 GameObject:
   m_ObjectHideFlags: 0

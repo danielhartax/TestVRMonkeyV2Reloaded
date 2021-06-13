@@ -21,7 +21,7 @@ public class Door : MonoBehaviour {
     public Material normalMaterial;
     public Material lockedMaterial;
 
-    public Renderer doorRenderer;
+    public List<Renderer> doorRenderer = new List<Renderer>();
 
     void OnTriggerEnter(Collider col)
     {
@@ -40,7 +40,11 @@ public class Door : MonoBehaviour {
                 if (GameLogic.instance.keys > 0)
                 {
                     GameLogic.instance.useKey();
-                    doorRenderer.material = normalMaterial;
+                    for(int i = 0; i < doorRenderer.Count; i++)
+                    {
+                        doorRenderer[i].material = normalMaterial;
+                    }
+                    
                     Open();
                     
                 }
@@ -64,7 +68,10 @@ public class Door : MonoBehaviour {
 
         if (locked)
         {
-            doorRenderer.material = lockedMaterial;
+            for (int i = 0; i < doorRenderer.Count; i++)
+            {
+                doorRenderer[i].material = lockedMaterial;
+            }
         }
 	}
 	

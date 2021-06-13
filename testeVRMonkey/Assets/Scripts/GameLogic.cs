@@ -43,6 +43,7 @@ public class GameLogic : MonoBehaviour {
     float wheelSound;
 
     public GameObject keyBoardKeys;
+    public GameObject FinalKey;
     public GameObject gamepadKeys;
 
     public Text keyText;
@@ -113,6 +114,7 @@ public class GameLogic : MonoBehaviour {
 
     public void Start()
     {
+        FinalKey.SetActive(false);
         if (Input.GetJoystickNames().Length == 0)
         {
             keyBoardKeys.SetActive(true);
@@ -270,6 +272,11 @@ public class GameLogic : MonoBehaviour {
                 playerWheelSource.UnPause();
             }
         }
+    }
+
+    public void showFinalKey(bool status)
+    {
+        FinalKey.SetActive(status);
     }
 
     public void EndGame()

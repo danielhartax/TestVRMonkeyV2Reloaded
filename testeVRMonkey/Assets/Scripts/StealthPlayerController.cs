@@ -2,14 +2,16 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class StealthPlayerController : Character {
+public class StealthPlayerController : Character
+{
 
-    
+
     Camera cam;
     public Rigidbody rb;
 
     public GameObject normalModel;
     public GameObject cloakedModel;
+    public GameObject onBoxModel;
 
     Renderer normalRenderer;
     Renderer cloakedRenderer;
@@ -30,6 +32,9 @@ public class StealthPlayerController : Character {
     public RobotThreadController threadController;
     public float threadWalkSpeed = 0.5f;
     public float threadRunSpeed = 0.75f;
+
+    //base para delimitar o altura maxima do hover
+    private float hoverLimit = 0;
 
     [Header("Rotation")]
     public float rotateSpeed = 5.0f;
@@ -55,10 +60,12 @@ public class StealthPlayerController : Character {
     [Header("Skills")]
     public bool cloaked = false;
     public bool running = false;
+    public bool floating = false;
     public float runningSpeedMultiplier = 1.5f;
     public float runningEnergyMultiplier = 1.5f;
     public float cloakingEnergyMultiplier = 3.5f;
     public float drainingEnergyMultiplier = 4.0f;
+    public float floatingEnergyMultiplier = 2f;
     public float shockDelay = 0.3f;
     public float shockCost = 10;
     public float drainSpeed = 0;
@@ -70,9 +77,14 @@ public class StealthPlayerController : Character {
 
     public AIAgent drainTarget;
 
+    public float fireCost = 10f;
+
     [Header("Effects")]
     public ParticleSystem walkParticles;
     public ParticleSystem runParticles;
+    public ParticleSystem startParticles;
+    public ParticleSystem hoverParticles;
+    public AudioSource hoverSFX;
 
     [Header("Upgrades")]
     public bool canShock = false;
@@ -80,7 +92,7 @@ public class StealthPlayerController : Character {
     public bool canDrain = false;
 
     public ParticleSystem warpParticles;
-    
+
 
     static StealthPlayerController _instance;
     public static StealthPlayerController getInstance()
@@ -94,7 +106,10 @@ public class StealthPlayerController : Character {
     }
 
     // Use this for initialization
-    void Start () {
+    void Start()
+    {
+        ParticleSystem sp = Instantiate(startParticles, gameObject.transform.position, Quaternion.Euler(new Vector3(-90f, 0f, 0f)));
+        Destroy(sp.gameObject, 4f);
         audioSource = GetComponent<AudioSource>();
         cam = Camera.main;
         rb = GetComponent<Rigidbody>();
@@ -106,8 +121,8 @@ public class StealthPlayerController : Character {
         {
             energyBar.SetInitialValues(maxEnergy, 0, energy);
         }
-	}
-	
+    }
+
     public void SetEnergy(float val)
     {
         energy = val;
@@ -135,7 +150,7 @@ public class StealthPlayerController : Character {
         energy = Mathf.Min(maxEnergy, energy);
         energyBar.UpdateBar(energy);
 
-        UpdateEnergyColor(energy/maxEnergy);
+        UpdateEnergyColor(energy / maxEnergy);
         if (energy <= 0)
         {
             GameLogic.instance.GameOver();
@@ -144,8 +159,8 @@ public class StealthPlayerController : Character {
 
     void UpdateEnergyColor(float fraction)
     {
-       normalRenderer.material.SetColor("_EmissionColor", Color.white * fraction);
-       cloakedRenderer.material.SetColor("_EmissionColor", Color.white * fraction);
+        normalRenderer.material.SetColor("_EmissionColor", Color.white * fraction);
+        cloakedRenderer.material.SetColor("_EmissionColor", Color.white * fraction);
     }
     IEnumerator shockRoutine()
     {
@@ -165,7 +180,7 @@ public class StealthPlayerController : Character {
         {
             drainTarget.OnDrainEnd();
         }
-        
+
         SetState(States.idle);
         drainObject.SetActive(false);
     }
@@ -184,17 +199,51 @@ public class StealthPlayerController : Character {
     }
 
     // Update is called once per frame
-    void Update() {
+    void LateUpdate()
+    {
         if (GameLogic.instance.gameState != GameLogic.GameStates.gameplay)
         {
             return;
         }
 
+
+
+
+        if (Input.GetButtonDown("Jump") && energy >= floatingEnergyMultiplier)
+        {
+            floating = true;
+            hoverLimit = transform.position.y + 1;
+            hoverParticles.time = 0;
+            hoverParticles.Play();
+            hoverSFX.Play();
+        }
+        else if (Input.GetButton("Jump") && transform.position.y <= hoverLimit && energy >= floatingEnergyMultiplier)
+        {
+            rb.velocity = Vector3.up * (100f * Time.deltaTime);
+            floating = true;
+        }
+        else if (Input.GetButtonUp("Jump"))
+        {
+            floating = false;
+            hoverParticles.Stop();
+            hoverSFX.Stop();
+        }
+
+
+        if (Input.GetButtonDown("Fire1"))
+        {
+            if (energy >= fireCost) PlayerFire();
+            else ConsoleText.getInstance().ShowMessage("You don't have energy enough to shoot");
+        }
+
+
         if (state == States.attacking)
         {
-            if (!Input.GetButton("Drain")){
+            if (!Input.GetButton("Drain"))
+            {
                 StopDrain();
             }
+
         }
 
         if (canDrain && Input.GetButtonDown("Drain") && (state == States.idle || state == States.moving))
@@ -203,19 +252,21 @@ public class StealthPlayerController : Character {
             drainObject.SetActive(true);
             SetState(States.attacking);
             RaycastHit hit;
-            if(Physics.Raycast(transform.position,transform.forward,out hit, drainRange, enemyLayerMask))
+            if (Physics.Raycast(transform.position, transform.forward, out hit, drainRange, enemyLayerMask))
             {
                 Debug.Log("Hit " + hit.transform.gameObject.name);
                 AIAgent agent = hit.transform.gameObject.GetComponent<AIAgent>();
-                if(agent!=null && agent.aiSight.sightState != AISight.SightStates.seeingEnemy){
+                if (agent != null && agent.aiSight.sightState != AISight.SightStates.seeingEnemy)
+                {
                     agent.OnDrainStart();
                     Debug.Log("Draining ");
-                   // drainObject.SetActive(true);
-                   // SetState(States.attacking);
+                    // drainObject.SetActive(true);
+                    // SetState(States.attacking);
                     drainTarget = agent;
                 }
 
-            }else
+            }
+            else
             {
                 Debug.Log("No hit");
             }
@@ -251,13 +302,28 @@ public class StealthPlayerController : Character {
                 cloakedModel.SetActive(false);
             }
         }
+
+        if (!cloaked)
+        {
+            if (hidden)
+            {
+                normalModel.SetActive(false);
+                onBoxModel.SetActive(true);
+            }
+            else
+            {
+                normalModel.SetActive(true);
+                onBoxModel.SetActive(false);
+            }
+        }
         
+
 
 
         if (state == States.idle && !cloaked)
         {
- 
-        
+
+
 
             moving = false;
             inputVector = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
@@ -296,7 +362,7 @@ public class StealthPlayerController : Character {
                     {
                         walkParticles.Play();
                     }
-                    
+
                 }
                 else
                 {
@@ -308,7 +374,7 @@ public class StealthPlayerController : Character {
                     {
                         runParticles.Play();
                     }
-                    
+
                 }
 
 
@@ -326,13 +392,13 @@ public class StealthPlayerController : Character {
                 {
                     runParticles.Stop();
                 }
-                
+
                 threadController.moving = false;
             }
         }
         if (enableEnergyDrain)
         {
-            float energyDrain= energyDrainSpeed * Time.deltaTime;
+            float energyDrain = energyDrainSpeed * Time.deltaTime;
 
             if (energy <= maxEnergy * lowEnergyFraction)
             {
@@ -353,7 +419,12 @@ public class StealthPlayerController : Character {
                 energyDrain = energyDrain * standingEnergyMultiplier;
             }
 
-            if(state==States.attacking)
+            if (floating)
+            {
+                energyDrain = energyDrain * floatingEnergyMultiplier;
+            }
+
+            if (state == States.attacking)
             {
                 if (drainTarget == null)
                 {
@@ -363,18 +434,18 @@ public class StealthPlayerController : Character {
                 {
                     energyDrain = 0;
                 }
-                
+
             }
 
             energy -= energyDrain;
             energyBar.UpdateBar(energy);
             UpdateEnergyColor(energy / maxEnergy);
-            if (energy <= 0)
+            if (energy <= 0.1f)
             {
                 GameLogic.instance.GameOver();
             }
         }
-        
+
     }
 
     public ParticleSystem damageParticle;
@@ -396,7 +467,7 @@ public class StealthPlayerController : Character {
         float resultX = cos * direction.x + sin * direction.z;
         float resultZ = cos * direction.z - sin * direction.x;
 
-        Vector3 result = new Vector3(resultX,0, resultZ);
+        Vector3 result = new Vector3(resultX, 0, resultZ);
         return result;
     }
 
@@ -414,7 +485,8 @@ public class StealthPlayerController : Character {
         {
             newSpeed = speedToUse * new Vector3(direction.x, 0, direction.z);
         }
-        else {
+        else
+        {
             newSpeed = Vector3.Lerp(speed, speedToUse * new Vector3(direction.x, 0, direction.z), acceleration * Time.deltaTime);
         }
 
@@ -424,14 +496,15 @@ public class StealthPlayerController : Character {
 
         speed = newSpeed;
 
-        
+
 
 
         if (rb == null)
         {
             transform.position += Time.deltaTime * newSpeed;
         }
-        else {
+        else
+        {
             rb.velocity = newSpeed;
 
         }
@@ -447,7 +520,8 @@ public class StealthPlayerController : Character {
                 transform.rotation = Quaternion.AngleAxis(Vector2.Angle(Vector2.up, direction), Vector3.up);
 
             }
-            else {
+            else
+            {
                 rotationDestination = Quaternion.AngleAxis(Vector2.Angle(Vector2.up, direction), Vector3.up);
 
                 angleDiff = transform.rotation.eulerAngles.y - rotationDestination.eulerAngles.y;
@@ -460,13 +534,15 @@ public class StealthPlayerController : Character {
                 transform.rotation = Quaternion.Lerp(transform.rotation, rotationDestination, rotateSpeed * Time.deltaTime);
             }
         }
-        else {
+        else
+        {
 
             if (instanteRotate)
             {
                 transform.rotation = Quaternion.AngleAxis(-Vector2.Angle(Vector2.up, direction), Vector3.up);
             }
-            else {
+            else
+            {
                 rotationDestination = Quaternion.AngleAxis(-Vector2.Angle(Vector2.up, direction), Vector3.up);
 
                 angleDiff = transform.rotation.eulerAngles.y - rotationDestination.eulerAngles.y;
@@ -483,5 +559,11 @@ public class StealthPlayerController : Character {
     public void Kill()
     {
 
+    }
+    //Methodo de atirar do jogador
+    public void PlayerFire()
+    {
+        Fire();
+        SpendEnergy(fireCost);
     }
 }

@@ -2,22 +2,23 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class AIAgent : MonoBehaviour {
+public class AIAgent : MonoBehaviour
+{
 
     public Character character;
     public Transform target;
     public Transform lastTargetPosition;
 
-    public enum StateType { idle,chasing,seeking,damaged}
+    public enum StateType { idle, chasing, seeking, damaged }
     public StateType currentStateType = StateType.idle;
 
     IEnemyState currentState;
     public IEnemyState previousState;
     public GlobalState globalState = new GlobalState();
 
-    public IdleState idleState= new IdleState();
+    public IdleState idleState = new IdleState();
     public ChaseState chasingState = new ChaseState();
-    public SeekState seekingState= new SeekState();
+    public SeekState seekingState = new SeekState();
     public IEnemyState damagedState;
 
 
@@ -105,16 +106,18 @@ public class AIAgent : MonoBehaviour {
     }
 
     // Use this for initialization
-    void Start () {
+    void Start()
+    {
         cam = Camera.main;
         player = StealthPlayerController.getInstance();
         currentState = idleState;
         currentState.Start(this);
         globalState.Start(this);
-	}
-	
-	// Update is called once per frame
-	void Update () {
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
         if (bodyRenderer.isVisible)
         {
             searchLight.enabled = true;
@@ -148,7 +151,7 @@ public class AIAgent : MonoBehaviour {
         navAgent.threadController.moving = false;
         currentStateType = newState.getStateType();
 
-        if(currentStateType== StateType.idle)
+        if (currentStateType == StateType.idle)
         {
             Debug.Log("hm");
         }
@@ -175,9 +178,9 @@ public class AIAgent : MonoBehaviour {
 
     public IEnumerator DrainRoutine()
     {
-        while (character.energyLeft>0)
+        while (character.energyLeft > 0)
         {
-            character.energyLeft -=Time.deltaTime * player.drainSpeed;
+            character.energyLeft -= Time.deltaTime * player.drainSpeed;
             player.AddEnergy(Time.deltaTime * player.drainSpeed);
             SetEnergyFraction(character.energyLeft / character.maxDrainEnergy);
             yield return null;
@@ -190,7 +193,7 @@ public class AIAgent : MonoBehaviour {
 
     void SetEnergyFraction(float fraction)
     {
-        bodyRenderer.material.SetColor("_EmissionColor", Color.white*fraction);
+        bodyRenderer.material.SetColor("_EmissionColor", Color.white * fraction);
         searchLight.range = maxLightRange * fraction;
         aiSight.viewDistance = maxSightRange * fraction;
 
@@ -213,7 +216,7 @@ public class AIAgent : MonoBehaviour {
         yield return new WaitForSeconds(time);
         aiEnabled = true;
 
-       // target = StealthPlayerController.getInstance().transform;
+        // target = StealthPlayerController.getInstance().transform;
         //lastTargetPosition.position = target.position;
         searchLight.enabled = true;
         stunParticles.Stop();
@@ -324,5 +327,27 @@ public class AIAgent : MonoBehaviour {
     public Transform GetLastTargetPosition()
     {
         return lastTargetPosition;
+    }
+    //metodo de desligar o inimigo quando é acertado por um tiro
+    public void Shutdown()
+    {
+        //StopAllCoroutines();
+        GameLogic.instance.RemoveChaser();
+        searchLight.enabled = false;
+        stunParticles.Play();
+        aiEnabled = false;
+        StartCoroutine(ShutdownRoutine());
+    }
+
+    public IEnumerator ShutdownRoutine()
+    {
+        while (character.energyLeft > 0)
+        {
+            character.energyLeft -= Time.deltaTime * player.drainSpeed;
+            SetEnergyFraction(character.energyLeft / character.maxDrainEnergy);
+            yield return null;
+        }
+        stunParticles.Stop();
+
     }
 }

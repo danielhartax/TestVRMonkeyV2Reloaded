@@ -2,14 +2,16 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class HidingSpot : MonoBehaviour {
+public class HidingSpot : MonoBehaviour
+{
 
-	void OnTriggerEnter(Collider col)
+    void OnTriggerEnter(Collider col)
     {
-        if(col.CompareTag("Player"))
+        if (col.CompareTag("Player"))
         {
             StealthPlayerController.getInstance().hidden = true;
-            GameObject.Instantiate(EffectsManager.getInstance().boxEffect, transform.position, Quaternion.identity);
+            GameObject poof = GameObject.Instantiate(EffectsManager.getInstance().boxEffect, transform.position, Quaternion.identity);
+            Destroy(poof, 1f);
         }
     }
 
@@ -17,7 +19,7 @@ public class HidingSpot : MonoBehaviour {
     {
         if (col.CompareTag("Player"))
         {
-            GameObject.Instantiate(EffectsManager.getInstance().boxEffect, transform.position, Quaternion.identity);
+            //GameObject.Instantiate(EffectsManager.getInstance().boxEffect, transform.position, Quaternion.identity);
             StealthPlayerController.getInstance().hidden = false;
         }
     }

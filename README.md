@@ -80,7 +80,7 @@
 
 - Refiz as particulas do **drain**, com um script **DrainEffect** controlando o linerender do drain, **tiro**, **upgrade**, **hide**, **start**, **bateria**, **correr**, **andar**, **checkpoint** e **shock**,
 
-- Quando se esconde dentro de uma caixa, a particula eu deixei so na entrada da caixa e alem disso botei para o player ficar um shader de ver atraves da parede para ver o personagem dentro da caixa. 
+- Quando se esconde dentro de uma caixa, a particula eu deixei so na entrada da caixa e alem disso botei para o player ficar com um shader de ver atraves da parede para ver o personagem dentro da caixa. 
 
 - Mudei o shader do cloak para um transparente com outline. 
 

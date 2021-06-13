@@ -108,7 +108,7 @@ Material:
     - _Line1Alpha: 0.15
     - _Line1Feature: 1
     - _Line1Frequency: 100
-    - _Line1Hardness: 1.45
+    - _Line1Hardness: -4.8
     - _Line1InvertedThickness: 0
     - _Line1Speed: -3.57
     - _Line2Alpha: 0.1

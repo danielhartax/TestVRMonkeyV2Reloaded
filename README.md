@@ -10,7 +10,7 @@
 
 - Achei um erro que não estava listado. No primeiro inimigo,  ele não estava atirando. O console apontou que não tinha prefab definido para tiro. Reconfigurei o mesmo, atribuindo o prefab bullet do projeto, para solucionar isso mas de qualquer forma ele tava grifado que estava fora do padrão do prefab original. Usar o restaurar o prefab resolveria o problema da mesma forma.
 
-- O shock não estava funcionando pq na classe **ShockDamageArea**  o objeto do tipo **AIAgent**  instanciada estava passando o valor **0** para o método **OnShock**. Troquei o **0** pelo atributo **stunTime**.
+- O shock não estava funcionando pq na classe **ShockDamageArea**  o objeto do tipo **AIAgent**  instanciado estava passando o valor **0** para o método **OnShock**. Troquei o **0** pelo atributo **stunTime**.
 
 - A principio aqui não "engasgou" nada mas como você disse que tava engasgando algo, fui pesquisar no código. Já que foi algo colocado intecionalmente, imaginei que fosse algo que rodasse em determinado intervalo de tempo. Então, fazendo uma busca por **Time.deltaTime** achei o objeto Spin com uma routine pesada toda vida com direito ao recadinho deixado por você *"Isso aqui é só para te causar problema"* :tw-1f60b: Com isso, só foi achar na cena o objeto que estava com esse script atrelado. Era o **Cube (5)**. Um cubo flutuante aleatório na cena no meio do nada. Exclui ele e ficou tudo certo.
 

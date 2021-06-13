@@ -6,7 +6,7 @@
 
 # Bugs conhecidos corrigidos. 
 
-- O bug da porta era pq as portas não estavam com o atributo **IsTrigger** ativados tendo em vista que a classe dele era com base em **OnTriggerEnter** para disparar a ação. Setei pra true os atributos e elas voltaram a funcionar.
+- O bug da porta era pq as portas não estavam com o atributo **IsTrigger** do collider ativados tendo em vista que a classe delas eram com base em **OnTriggerEnter** para disparar a ação. Setei pra true os atributos e elas voltaram a funcionar.
 
 - Achei um erro que não estava listado. No primeiro inimigo,  ele não estava atirando. O console apontou que não tinha prefab definido para tiro. Reconfigurei o mesmo, atribuindo o prefab bullet do projeto, para solucionar isso mas de qualquer forma ele tava grifado que estava fora do padrão do prefab original. Usar o restaurar o prefab resolveria o problema da mesma forma.
 

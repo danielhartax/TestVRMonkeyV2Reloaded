@@ -90,6 +90,7 @@ public class StealthPlayerController : Character
     public bool canShock = false;
     public bool canCloak = false;
     public bool canDrain = false;
+    public bool canShoot = false;
 
     public ParticleSystem warpParticles;
 
@@ -230,7 +231,7 @@ public class StealthPlayerController : Character
         }
 
 
-        if (Input.GetButtonDown("Fire1"))
+        if (canShoot && Input.GetButtonDown("Fire1"))
         {
             if (energy >= fireCost) PlayerFire();
             else ConsoleText.getInstance().ShowMessage("You don't have energy enough to shoot");

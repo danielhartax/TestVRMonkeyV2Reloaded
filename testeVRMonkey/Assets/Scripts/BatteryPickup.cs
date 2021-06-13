@@ -7,7 +7,6 @@ public class BatteryPickup : MonoBehaviour {
     public float val = 20;
 
 
-
     public void OnTriggerEnter(Collider col)
     {
         StealthPlayerController player = StealthPlayerController.getInstance();

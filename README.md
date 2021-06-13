@@ -38,6 +38,8 @@
 
 ### Hover
 
+- Setei o input **SPACE** para flutuar
+
 - Fiz uma o uma função no **Update** que mantem voando caso mantenha o espaço pressionado com uma altura limite para ficar flutuando.
 
 - Seguindo o padrão do projeto, criei o **boolean floating**, o atributo **floatingEnergyMultiplier** e segui o mesmo padrão de drenagem de energia com base nos status fazendo verificacao no **enableEnergyDrain**
